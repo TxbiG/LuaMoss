@@ -1,5 +1,6 @@
 #include <lua.hpp>
 
+#include <Moss/Moss_stdinc.h>
 #include <Moss/Moss_Platform.h>
 #include <Moss/Moss_Renderer.h>
 #include <Moss/Variants/Color.h>
@@ -13,6 +14,106 @@
 #include <new>
 
 namespace {
+
+
+// Platform
+struct Window { Moss_Window* value{}; };
+struct Monitor { Moss_Monitor* value{}; };
+struct Gamepad { Moss_Gamepad* value{}; };
+struct Haptic { Moss_Haptic* value{}; };
+struct Camera { Moss_Camera* value{}; };
+struct Storage { Moss_Storage* value{}; };
+
+struct { Moss_Curser* value{}; };
+struct { Moss_GamepadBinding* value{}; };
+struct { Moss_Capture* value{}; }; // Camera Device Dont use as the rendering camera
+struct { Moss_Storage* value{}; };
+struct { Moss_Surface* value{}; };
+struct { Moss_HapticDirection* value{}; };
+struct { Moss_HapticConstant* value{}; };
+struct { Moss_HapticPeriodic* value{}; };
+struct { Moss_HapticCondition* value{}; };
+struct { Moss_HapticRamp* value{}; };
+struct { Moss_HapticLeftRight* value{}; };
+struct { Moss_HapticCustom* value{}; }; 
+union { Moss_HapticEffect* value{}; };
+struct { Moss_Haptic* value{}; };
+struct { Moss_Gamepad* value{}; };
+struct { Moss_GamepadAxis* value{}; };
+struct { Moss_CameraSpec* value{}; };
+struct { Moss_GammaRamp* value{}; };
+struct { Moss_VideoMode* value{}; };
+struct { Moss_Image* value{}; };
+struct { Moss_Locale* value{}; };
+struct { Moss_PenAxisEvent* value{}; };
+struct { Moss_PenButtonEvent* value{}; };
+struct { Moss_PenMotionEvent* value{}; };
+struct { Moss_PenProximityEvent* value{}; };
+struct { Moss_PenTouchEvent* value{}; };
+struct { Moss_Finger* value{}; };
+struct { Moss_HapticDirection* value{}; };
+struct { Moss_HapticLeftRight* value{}; };
+struct { Moss_HapticCustom* value{}; };
+struct { Moss_HapticRamp* value{}; };
+struct { Moss_HapticConstant* value{}; };
+struct { Moss_HapticCondition* value{}; };
+struct { Moss_HapticPeriodic* value{}; };
+union { Moss_HapticEffect* value{}; };
+struct { Moss_Haptic* value{}; };
+struct { Moss_PathInfo* value{}; };
+struct { Moss_DialogFileFilter* value{}; };
+
+// Audio
+struct { AudioEffect* value{}; };
+struct { AudioStream* value{}; };
+struct { AudioStream2D* value{}; };
+struct { AudioStream3D* value{}; };
+struct { AudioListener2D* value{}; };
+struct { AudioListener3D* value{}; };
+struct { RayAudioListener2D* value{}; };
+struct { RayAudioListener3D* value{}; };
+struct { Moss_AudioSource* value{}; };
+struct { Moss_Microphone* value{}; };
+struct { Wav* value{}; };
+struct { Moss_AudioRayHit2D* value{}; };
+struct { Moss_AudioRayHit3D* value{}; };
+struct { Moss_AudioDecodedData* value{}; };
+struct { Moss_MicrophoneDesc* value{}; };
+struct { Moss_MicrophoneLevels* value{}; };
+struct { Moss_AudioRayTraceResult* value{}; };
+struct { Moss_AudioRayTrace2DDesc* value{}; };
+struct { Moss_AudioRayTrace3DDesc* value{}; };
+
+// GPU
+
+// Renderer
+struct Renderer { Moss_Renderer* value; };
+struct { SkyBox* value; };
+struct { Viewport* value; };
+struct { SubViewport* value; };
+struct { FogVolume* value; };
+struct { SurfaceInstance* value; };
+struct { Texture* value; };
+struct { Moss_Mesh* value; };
+struct { Moss_Font* value; };
+struct { Moss_Model* value; };
+
+struct Frustum2D { };
+struct Frustum3D { };
+
+// Navigation
+
+// XR
+
+// Network
+
+constexpr const char* WindowName  = "moss.Window";
+constexpr const char* MonitorName = "moss.Monitor";
+constexpr const char* GamepadName = "moss.Gamepad";
+constexpr const char* HapticName  = "moss.Haptic";
+constexpr const char* CameraName  = "moss.Camera";
+constexpr const char* StorageName = "moss.Storage";
+
 constexpr const char* Vec2Name = "moss.Vec2";
 constexpr const char* Vec3Name = "moss.Vec3";
 constexpr const char* Vec4Name = "moss.Vec4";
@@ -75,9 +176,8 @@ int quat_new(lua_State*L){push(L,QuatName,Quat(static_cast<float>(luaL_optnumber
 int quat_rotation(lua_State*L){auto*axis=check<Vec3>(L,1,Vec3Name);push(L,QuatName,Quat::sRotation(*axis,static_cast<float>(luaL_checknumber(L,2))));return 1;}
 int quat_rotate(lua_State*L){auto*q=check<Quat>(L,1,QuatName);auto*v=check<Vec3>(L,2,Vec3Name);push(L,Vec3Name,*q**v);return 1;}
 int quat_index(lua_State*L){auto*q=check<Quat>(L,1,QuatName);const char*k=luaL_checkstring(L,2);if(!std::strcmp(k,"x")){lua_pushnumber(L,q->GetX());return 1;}if(!std::strcmp(k,"y")){lua_pushnumber(L,q->GetY());return 1;}if(!std::strcmp(k,"z")){lua_pushnumber(L,q->GetZ());return 1;}if(!std::strcmp(k,"w")){lua_pushnumber(L,q->GetW());return 1;}luaL_getmetatable(L,QuatName);lua_getfield(L,-1,k);return 1;}
+static int poll_events(lua_State*){Moss_PollEvents();return 0;}
 
-struct Window { Moss_Window* value; };
-struct Renderer { Moss_Renderer* value; };
 int window_new(lua_State*L){auto*w=static_cast<Window*>(lua_newuserdatauv(L,sizeof(Window),0));w->value=Moss_CreateWindow(luaL_checkstring(L,1),static_cast<int>(luaL_checkinteger(L,2)),static_cast<int>(luaL_checkinteger(L,3)),nullptr,nullptr);if(!w->value)return luaL_error(L,"Moss_CreateWindow failed");luaL_setmetatable(L,WindowName);return 1;}
 int window_gc(lua_State*L){auto*w=check<Window>(L,1,WindowName);if(w->value){Moss_TerminateWindow(w->value);w->value=nullptr;}return 0;}
 int window_close(lua_State*L){Moss_CloseWindow(check<Window>(L,1,WindowName)->value);return 0;}
@@ -89,7 +189,6 @@ int renderer_begin(lua_State*L){Moss_RendererBeginFrame(check<Renderer>(L,1,Rend
 int renderer_end(lua_State*L){Moss_RendererEndFrame(check<Renderer>(L,1,RendererName)->value);return 0;}
 int renderer_line2d(lua_State*L){auto*r=check<Renderer>(L,1,RendererName);auto*a=check<Vec2>(L,2,Vec2Name);auto*b=check<Vec2>(L,3,Vec2Name);auto*c=check<Color>(L,4,ColorName);Moss_RendererDrawLine2D(r->value,a,b,*c,static_cast<float>(luaL_optnumber(L,5,1)));return 0;}
 int renderer_circle2d(lua_State*L){auto*r=check<Renderer>(L,1,RendererName);auto*p=check<Vec2>(L,2,Vec2Name);auto*c=check<Color>(L,4,ColorName);Moss_RendererDrawCircle2D(r->value,p,static_cast<float>(luaL_checknumber(L,3)),*c);return 0;}
-int poll_events(lua_State*){Moss_PollEvents();return 0;}
 int window_size(lua_State*L){lua_pushinteger(L,Moss_GetWindowWidth());lua_pushinteger(L,Moss_GetWindowHeight());return 2;}
 int mouse_position(lua_State*L){int x,y;Moss_GetMousePosition(&x,&y);lua_pushinteger(L,x);lua_pushinteger(L,y);return 2;}
 int key_pressed(lua_State*L){lua_pushboolean(L,Moss_IsKeyPressed(static_cast<Moss_Keyboard>(luaL_checkinteger(L,1))));return 1;}
