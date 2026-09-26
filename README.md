@@ -1,3 +1,4 @@
+[![Build](https://github.com/TxbiG/LuaMoss/actions/workflows/build.yml/badge.svg)](https://github.com/TxbiG/LuaMoss/actions/workflows/build.yml)
 # LuaMoss
 
 LuaMoss is a Lua 5.4 module for the Moss Framework. It uses Lua's small native C API directly, avoiding a generated binding with unclear C++ ownership.
