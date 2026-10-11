@@ -19,6 +19,7 @@ Comprehensive documentation is available in the [`docs/`](./docs) directory:
 - [API cheatsheet](docs/API_Cheatsheet.md)
 
 ## Compiling
+- Moss framework 0.1.0
 - Lua 5.4
 - C++ 17
 
