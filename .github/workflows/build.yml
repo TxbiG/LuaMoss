@@ -19,12 +19,12 @@ jobs:
 
     steps:
       - name: Checkout LuaMoss
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: LuaMoss
 
       - name: Checkout Moss
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: TxbiG/Moss
           path: Moss
